@@ -112,7 +112,7 @@
             background-clip: text;
             text-shadow: 0 0 30px rgba(255, 75, 75, 0.5);
             letter-spacing: 5px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             animation: glow 2s ease-in-out infinite;
         }
 
@@ -121,10 +121,49 @@
             50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 75, 75, 0.8)); }
         }
 
+        .logo-image {
+            max-width: 300px;
+            height: auto;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 20px rgba(255, 75, 75, 0.6));
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         .logo p {
             font-size: 1.2em;
             color: #ffaaaa;
             letter-spacing: 3px;
+            margin-top: 10px;
+        }
+
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 75, 75, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .audio-control:hover {
+            background: rgba(255, 75, 75, 0.3);
+            border-color: rgba(255, 75, 75, 0.8);
+            transform: scale(1.05);
+        }
+
+        .audio-icon {
+            font-size: 1.2em;
+            color: #ff8484;
         }
 
         .loading-section {
@@ -269,9 +308,23 @@
     <div class="overlay"></div>
     <div class="particles" id="particles"></div>
 
+    <!-- Contrôle audio -->
+    <div class="audio-control" id="audioControl" onclick="toggleAudio()">
+        <span class="audio-icon" id="audioIcon">🔊</span>
+    </div>
+
+    <!-- Audio (musique de fond) -->
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="container">
         <div class="logo">
             <h1>DEMON SLAYER</h1>
+            
+            <!-- LOGO ICI : Uploadez votre logo.png sur GitHub -->
+            <img src="logo.png" alt="Logo du serveur" class="logo-image" onerror="this.style.display='none'">
+            
             <p>— ROLEPLAY SERVER —</p>
         </div>
 
@@ -285,11 +338,11 @@
         </div>
 
         <div class="info-box">
-            <h2>⚔ INFORMATIONS DU SERVEUR ⚔</h2>
+            <h2>INFORMATIONS DU SERVEUR</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <strong>JOUEURS EN LIGNE</strong>
-                    <span id="players">0/32</span>
+                    <span id="players">0/128</span>
                 </div>
                 <div class="info-item">
                     <strong>MAP ACTUELLE</strong>
@@ -321,6 +374,37 @@
     </div>
 
     <script>
+        // Variables audio
+        const bgMusic = document.getElementById('bgMusic');
+        const audioIcon = document.getElementById('audioIcon');
+        let isPlaying = false;
+
+        // Fonction pour toggle la musique
+        function toggleAudio() {
+            if (isPlaying) {
+                bgMusic.pause();
+                audioIcon.textContent = '🔇';
+                isPlaying = false;
+            } else {
+                bgMusic.play().catch(e => console.log('Autoplay bloqué:', e));
+                audioIcon.textContent = '🔊';
+                isPlaying = true;
+            }
+        }
+
+        // Démarrage automatique de la musique (avec gestion du blocage navigateur)
+        window.addEventListener('load', () => {
+            bgMusic.volume = 0.3; // Volume à 30%
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                audioIcon.textContent = '🔊';
+            }).catch(e => {
+                // Si autoplay bloqué, l'utilisateur devra cliquer sur le bouton
+                console.log('Autoplay bloqué par le navigateur');
+                audioIcon.textContent = '🔇';
+            });
+        });
+
         // Création des particules
         const particlesContainer = document.getElementById('particles');
         for (let i = 0; i < 50; i++) {
@@ -346,15 +430,13 @@
             "Presque prêt..."
         ];
 
-        // Fonction pour les fonctions GMOD
+        // Fonctions GMOD
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             document.getElementById('mapName').textContent = mapname || 'kimetsu_village';
         }
 
         function SetStatusChanged(status) {
-            let messageIndex = Math.floor((progress / 100) * loadingMessages.length);
-            if (messageIndex >= loadingMessages.length) messageIndex = loadingMessages.length - 1;
-            loadingText.textContent = status || loadingMessages[messageIndex];
+            loadingText.textContent = status;
         }
 
         function SetFilesNeeded(needed) {
@@ -367,10 +449,6 @@
 
         function DownloadingFile(fileName) {
             loadingText.textContent = `Téléchargement: ${fileName}`;
-        }
-
-        function SetStatusChanged(status) {
-            loadingText.textContent = status;
         }
 
         // Simulation de chargement (pour prévisualisation)
@@ -390,7 +468,7 @@
             }
         }, 100);
 
-        // Mise à jour du nombre de joueurs (simulation)
+        // Mise à jour du nombre de joueurs
         function UpdatePlayers(current, max) {
             document.getElementById('players').textContent = `${current}/${max}`;
         }

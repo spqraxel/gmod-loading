@@ -26,12 +26,6 @@
             height: 100%;
             background: url('https://images.unsplash.com/photo-1528164344705-47542687000d?w=1920&q=80') center/cover;
             opacity: 0.3;
-            animation: slowZoom 30s infinite alternate;
-        }
-
-        @keyframes slowZoom {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
         }
 
         .overlay {
@@ -58,20 +52,6 @@
             height: 3px;
             background: rgba(255, 100, 100, 0.6);
             border-radius: 50%;
-            animation: float 8s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { 
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { 
-                transform: translateY(-100vh) translateX(50px);
-                opacity: 0;
-            }
         }
 
         .container {
@@ -88,18 +68,6 @@
         .logo {
             text-align: center;
             margin-bottom: 30px;
-            animation: fadeInDown 1s ease-out;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .logo h1 {
@@ -113,12 +81,6 @@
             text-shadow: 0 0 30px rgba(255, 75, 75, 0.5);
             letter-spacing: 5px;
             margin-bottom: 20px;
-            animation: glow 2s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(255, 75, 75, 0.5)); }
-            50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 75, 75, 0.8)); }
         }
 
         .logo-image {
@@ -126,12 +88,6 @@
             height: auto;
             margin: 20px 0;
             filter: drop-shadow(0 0 20px rgba(255, 75, 75, 0.6));
-            animation: logoFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
 
         .logo p {
@@ -141,41 +97,10 @@
             margin-top: 10px;
         }
 
-        .audio-control {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 15px;
-            border-radius: 30px;
-            border: 2px solid rgba(255, 75, 75, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .audio-control:hover {
-            background: rgba(255, 75, 75, 0.3);
-            border-color: rgba(255, 75, 75, 0.8);
-            transform: scale(1.05);
-        }
-
-        .audio-icon {
-            font-size: 1.2em;
-            color: #ff8484;
-        }
-
         .loading-section {
             width: 100%;
             max-width: 600px;
             margin-top: 30px;
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .loading-text {
@@ -202,12 +127,6 @@
             border-radius: 10px;
             transition: width 0.3s ease;
             box-shadow: 0 0 20px rgba(255, 75, 75, 0.8);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -100% 0; }
-            100% { background-position: 200% 0; }
         }
 
         .info-box {
@@ -254,52 +173,11 @@
             color: #fff;
         }
 
-        .rules {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 10px;
-            border-left: 4px solid #ff4b4b;
-        }
-
-        .rules h3 {
-            color: #ff6b6b;
-            margin-bottom: 10px;
-        }
-
-        .rules ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .rules li {
-            padding: 8px 0;
-            color: #ddd;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .rules li:before {
-            content: "⚔ ";
-            color: #ff4b4b;
-            margin-right: 10px;
-        }
-
         .footer {
             margin-top: 30px;
             text-align: center;
             color: #999;
             font-size: 0.9em;
-        }
-
-        .sword-icon {
-            display: inline-block;
-            animation: rotate 4s linear infinite;
-            margin: 0 10px;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -308,13 +186,8 @@
     <div class="overlay"></div>
     <div class="particles" id="particles"></div>
 
-    <!-- Contrôle audio -->
-    <div class="audio-control" id="audioControl" onclick="toggleAudio()">
-        <span class="audio-icon" id="audioIcon">🔊</span>
-    </div>
-
-    <!-- Audio (musique de fond) -->
-    <audio id="bgMusic" loop>
+    <!-- Audio (musique de fond en autoplay forcé) -->
+    <audio id="bgMusic" autoplay loop preload="auto">
         <source src="music.mp3" type="audio/mpeg">
     </audio>
 
@@ -325,7 +198,7 @@
             <!-- LOGO ICI : Uploadez votre logo.png sur GitHub -->
             <img src="logo.png" alt="Logo du serveur" class="logo-image" onerror="this.style.display='none'">
             
-            <p>— ROLEPLAY SERVER —</p>
+            <p>— BREATHIA —</p>
         </div>
 
         <div class="loading-section">
@@ -338,11 +211,11 @@
         </div>
 
         <div class="info-box">
-            <h2>INFORMATIONS DU SERVEUR</h2>
+            <h2>⚔ INFORMATIONS DU SERVEUR ⚔</h2>
             <div class="info-grid">
                 <div class="info-item">
                     <strong>JOUEURS EN LIGNE</strong>
-                    <span id="players">0/128</span>
+                    <span id="players">0/32</span>
                 </div>
                 <div class="info-item">
                     <strong>MAP ACTUELLE</strong>
@@ -353,68 +226,47 @@
                     <span>DarkRP</span>
                 </div>
             </div>
-
-            <div class="rules">
-                <h3>📜 Règles Principales</h3>
-                <ul>
-                    <li>Respectez les autres joueurs et le staff</li>
-                    <li>Pas de RDM, CDM ou Meta-gaming</li>
-                    <li>Restez dans votre rôle en permanence</li>
-                    <li>Utilisez le /advert avant toute action RP</li>
-                    <li>Pas de prop-block ou prop-kill</li>
-                </ul>
-            </div>
         </div>
 
         <div class="footer">
-            <span class="sword-icon">⚔</span>
-            Bon jeu sur notre serveur !
-            <span class="sword-icon">⚔</span>
+            ⚔ Bon jeu sur notre serveur ! ⚔
         </div>
     </div>
 
     <script>
-        // Variables audio
-        const bgMusic = document.getElementById('bgMusic');
-        const audioIcon = document.getElementById('audioIcon');
-        let isPlaying = false;
-
-        // Fonction pour toggle la musique
-        function toggleAudio() {
-            if (isPlaying) {
-                bgMusic.pause();
-                audioIcon.textContent = '🔇';
-                isPlaying = false;
-            } else {
-                bgMusic.play().catch(e => console.log('Autoplay bloqué:', e));
-                audioIcon.textContent = '🔊';
-                isPlaying = true;
-            }
-        }
-
-        // Démarrage automatique de la musique (avec gestion du blocage navigateur)
-        window.addEventListener('load', () => {
-            bgMusic.volume = 0.3; // Volume à 30%
-            bgMusic.play().then(() => {
-                isPlaying = true;
-                audioIcon.textContent = '🔊';
-            }).catch(e => {
-                // Si autoplay bloqué, l'utilisateur devra cliquer sur le bouton
-                console.log('Autoplay bloqué par le navigateur');
-                audioIcon.textContent = '🔇';
-            });
-        });
-
         // Création des particules
         const particlesContainer = document.getElementById('particles');
         for (let i = 0; i < 50; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 8 + 's';
-            particle.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            particle.style.top = Math.random() * 100 + '%';
             particlesContainer.appendChild(particle);
         }
+
+        // Gestion de la musique avec autoplay forcé
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.3;
+
+        // Force l'autoplay (plusieurs tentatives)
+        window.addEventListener('load', () => {
+            const playAttempt = bgMusic.play();
+            if (playAttempt !== undefined) {
+                playAttempt.catch(() => {
+                    // Si bloqué, on réessaye au premier clic
+                    document.addEventListener('click', () => {
+                        bgMusic.play();
+                    }, { once: true });
+                });
+            }
+        });
+
+        // Réessayer de jouer la musique à chaque interaction
+        document.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play();
+            }
+        });
 
         // Simulation de progression
         let progress = 0;

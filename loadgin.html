@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chargement - Demon Slayer RP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1528164344705-47542687000d?w=1920&q=80') center/cover;
+            opacity: 0.3;
+            animation: slowZoom 30s infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 100, 100, 0.6);
+            border-radius: 50%;
+            animation: float 8s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo h1 {
+            font-size: 4em;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #ff4b4b, #ff8484, #ff4b4b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 75, 75, 0.5);
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(255, 75, 75, 0.5)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 75, 75, 0.8)); }
+        }
+
+        .logo p {
+            font-size: 1.2em;
+            color: #ffaaaa;
+            letter-spacing: 3px;
+        }
+
+        .loading-section {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 30px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading-text {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 75, 75, 0.3);
+            border: 1px solid rgba(255, 75, 75, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4b4b, #ff8484, #ffaaaa);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 75, 75, 0.8);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .info-box {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 75, 75, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+        }
+
+        .info-box h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: rgba(255, 75, 75, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 75, 75, 0.2);
+            text-align: center;
+        }
+
+        .info-item strong {
+            display: block;
+            color: #ff8484;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .info-item span {
+            font-size: 1.1em;
+            color: #fff;
+        }
+
+        .rules {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border-left: 4px solid #ff4b4b;
+        }
+
+        .rules h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .rules ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .rules li {
+            padding: 8px 0;
+            color: #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .rules li:before {
+            content: "⚔ ";
+            color: #ff4b4b;
+            margin-right: 10px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .sword-icon {
+            display: inline-block;
+            animation: rotate 4s linear infinite;
+            margin: 0 10px;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="logo">
+            <h1>DEMON SLAYER</h1>
+            <p>— ROLEPLAY SERVER —</p>
+        </div>
+
+        <div class="loading-section">
+            <div class="loading-text" id="loadingText">
+                Chargement en cours...
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h2>⚔ INFORMATIONS DU SERVEUR ⚔</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>JOUEURS EN LIGNE</strong>
+                    <span id="players">0/32</span>
+                </div>
+                <div class="info-item">
+                    <strong>MAP ACTUELLE</strong>
+                    <span id="mapName">kimetsu_village</span>
+                </div>
+                <div class="info-item">
+                    <strong>GAMEMODE</strong>
+                    <span>DarkRP</span>
+                </div>
+            </div>
+
+            <div class="rules">
+                <h3>📜 Règles Principales</h3>
+                <ul>
+                    <li>Respectez les autres joueurs et le staff</li>
+                    <li>Pas de RDM, CDM ou Meta-gaming</li>
+                    <li>Restez dans votre rôle en permanence</li>
+                    <li>Utilisez le /advert avant toute action RP</li>
+                    <li>Pas de prop-block ou prop-kill</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="sword-icon">⚔</span>
+            Bon jeu sur notre serveur !
+            <span class="sword-icon">⚔</span>
+        </div>
+    </div>
+
+    <script>
+        // Création des particules
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            particle.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Simulation de progression
+        let progress = 0;
+        const progressFill = document.getElementById('progressFill');
+        const loadingText = document.getElementById('loadingText');
+        
+        const loadingMessages = [
+            "Connexion au serveur...",
+            "Chargement des ressources...",
+            "Téléchargement des fichiers...",
+            "Initialisation du monde...",
+            "Préparation de votre aventure...",
+            "Presque prêt..."
+        ];
+
+        // Fonction pour les fonctions GMOD
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+            document.getElementById('mapName').textContent = mapname || 'kimetsu_village';
+        }
+
+        function SetStatusChanged(status) {
+            let messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+            if (messageIndex >= loadingMessages.length) messageIndex = loadingMessages.length - 1;
+            loadingText.textContent = status || loadingMessages[messageIndex];
+        }
+
+        function SetFilesNeeded(needed) {
+            loadingText.textContent = `Téléchargement: ${needed} fichiers restants`;
+        }
+
+        function SetFilesTotal(total) {
+            // Gestion du total de fichiers
+        }
+
+        function DownloadingFile(fileName) {
+            loadingText.textContent = `Téléchargement: ${fileName}`;
+        }
+
+        function SetStatusChanged(status) {
+            loadingText.textContent = status;
+        }
+
+        // Simulation de chargement (pour prévisualisation)
+        const interval = setInterval(() => {
+            if (progress < 100) {
+                progress += Math.random() * 3;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = progress + '%';
+                
+                let messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+                if (messageIndex >= loadingMessages.length) messageIndex = loadingMessages.length - 1;
+                loadingText.textContent = loadingMessages[messageIndex];
+            } else {
+                clearInterval(interval);
+                loadingText.textContent = "Chargement terminé !";
+            }
+        }, 100);
+
+        // Mise à jour du nombre de joueurs (simulation)
+        function UpdatePlayers(current, max) {
+            document.getElementById('players').textContent = `${current}/${max}`;
+        }
+    </script>
+</body>
+</html>

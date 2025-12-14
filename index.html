@@ -44,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://wallpapercave.com/wp/wp10876400.jpg') center/cover;
+            background: url('https://images.unsplash.com/photo-1609743522471-83c84ce23e32?w=1920&q=80') center/cover;
             opacity: 0.4;
             filter: brightness(0.7) contrast(1.3) saturate(1.2) hue-rotate(340deg);
         }
@@ -67,7 +67,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://wallpapercave.com/wp/wp11190883.jpg') center/cover;
+            background: url('https://images.unsplash.com/photo-1555861496-0666c8981751?w=1920&q=80') center/cover;
             opacity: 0.4;
             filter: brightness(0.7) contrast(1.3) saturate(1.2) hue-rotate(200deg);
         }
@@ -421,6 +421,10 @@
         // Fonctions GMOD
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
             document.getElementById('mapName').textContent = mapname || 'kimetsu_village';
+            // GMOD ne fournit pas directement le nombre de joueurs ici, mais on stocke maxplayers
+            if (maxplayers) {
+                document.getElementById('players').textContent = `0/${maxplayers}`;
+            }
         }
 
         function SetStatusChanged(status) {
@@ -437,6 +441,11 @@
 
         function DownloadingFile(fileName) {
             loadingText.textContent = `Téléchargement: ${fileName}`;
+        }
+
+        // Cette fonction est appelée par GMOD pour mettre à jour le nombre de joueurs
+        function SetPlayerCount(current, max) {
+            document.getElementById('players').textContent = `${current}/${max}`;
         }
 
         // Simulation de chargement
@@ -460,6 +469,31 @@
         function UpdatePlayers(current, max) {
             document.getElementById('players').textContent = `${current}/${max}`;
         }
+
+        // Récupérer les stats réelles du serveur via API
+        async function fetchServerStats() {
+            try {
+                // REMPLACEZ PAR VOTRE IP:PORT DE SERVEUR
+                const serverIP = '162.19.94.26';
+                const serverPort = '27023';
+                
+                // Option 1: Via API GameTracker
+                const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}:${serverPort}`);
+                const data = await response.json();
+                
+                if (data.online) {
+                    document.getElementById('players').textContent = `${data.players.online}/${data.players.max}`;
+                }
+            } catch (error) {
+                console.log('Impossible de récupérer les stats du serveur');
+            }
+        }
+
+        // Appeler la fonction au chargement
+        fetchServerStats();
+        
+        // Mettre à jour toutes les 30 secondes
+        setInterval(fetchServerStats, 30000);
     </script>
 </body>
 </html>

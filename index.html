@@ -367,8 +367,9 @@
         <source src="music.mp3" type="audio/mpeg">
     </audio>
 
-    <script>
-        // Création des particules pour chaque côté
+<script>
+        // --- 1. GESTION VISUELLE (Particules & Musique) ---
+
         function createParticles(containerId, count) {
             const container = document.getElementById(containerId);
             for (let i = 0; i < count; i++) {
@@ -376,6 +377,7 @@
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 3 + 2) + 's'; // Vitesse aléatoire
                 container.appendChild(particle);
             }
         }
@@ -383,117 +385,98 @@
         createParticles('demonsParticles', 50);
         createParticles('slayersParticles', 50);
 
-        // Gestion de la musique
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.05;
+        bgMusic.volume = 0.05; // Volume doux
 
-        window.addEventListener('load', () => {
-            const playAttempt = bgMusic.play();
-            if (playAttempt !== undefined) {
-                playAttempt.catch(() => {
-                    document.addEventListener('click', () => {
-                        bgMusic.play();
-                    }, { once: true });
-                });
-            }
-        });
+        // Astuce pour forcer la lecture de l'audio (les navigateurs bloquent souvent l'autoplay)
+        document.addEventListener('click', () => { bgMusic.play(); }, { once: true });
+        window.onload = () => { bgMusic.play().catch(e => console.log("Clic requis pour la musique")); };
 
-        document.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play();
-            }
-        });
 
-        // Simulation de progression
-        let progress = 0;
+        // --- 2. GESTION DU CHARGEMENT (Vraies données GMOD) ---
+
+        let totalFiles = 0;
+        let neededFiles = 0;
         const progressFill = document.getElementById('progressFill');
         const loadingText = document.getElementById('loadingText');
-        
-        const loadingMessages = [
-            "Connexion au serveur...",
-            "Chargement des ressources...",
-            "Téléchargement des fichiers...",
-            "Initialisation du monde...",
-            "Préparation de votre aventure...",
-            "Presque prêt..."
-        ];
 
-        // Fonctions GMOD
+        // Cette fonction est appelée par GMOD au début
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            document.getElementById('mapName').textContent = mapname || 'kimetsu_village';
-            // GMOD ne fournit pas directement le nombre de joueurs ici, mais on stocke maxplayers
-            if (maxplayers) {
-                document.getElementById('players').textContent = `0/${maxplayers}`;
-            }
+            // Mise à jour de la map et du gamemode
+            document.getElementById('mapName').textContent = mapname;
+            
+            // On lance la récupération des vrais joueurs ici
+            fetchServerData(mapname); 
         }
 
+        // Appelée quand le statut change (ex: "Sending Client Info...")
         function SetStatusChanged(status) {
             loadingText.textContent = status;
         }
 
-        function SetFilesNeeded(needed) {
-            loadingText.textContent = `Téléchargement: ${needed} fichiers restants`;
-        }
-
-        function SetFilesTotal(total) {
-            // Gestion du total de fichiers
-        }
-
+        // Appelée quand GMOD télécharge un fichier
         function DownloadingFile(fileName) {
-            loadingText.textContent = `Téléchargement: ${fileName}`;
+            loadingText.textContent = "Téléchargement : " + fileName;
         }
 
-        // Cette fonction est appelée par GMOD pour mettre à jour le nombre de joueurs
-        function SetPlayerCount(current, max) {
-            document.getElementById('players').textContent = `${current}/${max}`;
+        // Appelée pour définir le nombre total de fichiers à télécharger
+        function SetFilesTotal(total) {
+            totalFiles = total;
         }
 
-        // Simulation de chargement
-        const interval = setInterval(() => {
-            if (progress < 100) {
-                progress += Math.random() * 3;
-                if (progress > 100) progress = 100;
-                
-                progressFill.style.width = progress + '%';
-                
-                let messageIndex = Math.floor((progress / 100) * loadingMessages.length);
-                if (messageIndex >= loadingMessages.length) messageIndex = loadingMessages.length - 1;
-                loadingText.textContent = loadingMessages[messageIndex];
-            } else {
-                clearInterval(interval);
-                loadingText.textContent = "Chargement terminé !";
+        // Appelée à chaque fichier téléchargé (compte à rebours)
+        function SetFilesNeeded(needed) {
+            neededFiles = needed;
+            
+            // Calcul du pourcentage réel
+            if (totalFiles > 0) {
+                const percentage = Math.round(((totalFiles - neededFiles) / totalFiles) * 100);
+                progressFill.style.width = percentage + '%';
             }
-        }, 100);
-
-        // Mise à jour du nombre de joueurs
-        function UpdatePlayers(current, max) {
-            document.getElementById('players').textContent = `${current}/${max}`;
         }
 
-        // Récupérer les stats réelles du serveur via API
-        async function fetchServerStats() {
+        // --- 3. API POUR LES JOUEURS (Via BattleMetrics) ---
+        
+        // IMPORTANT : Tu dois trouver l'ID BattleMetrics de ton serveur.
+        // Va sur https://www.battlemetrics.com/servers/gmod, cherche ton serveur, 
+        // l'ID est dans l'URL (ex: .../servers/gmod/12345678)
+        const SERVER_IP = "51.178.49.51; 
+        const SERVER_PORT = "27015";
+
+        async function fetchServerData(currentMap) {
             try {
-                // REMPLACEZ PAR VOTRE IP:PORT DE SERVEUR
-                const serverIP = '162.19.94.26';
-                const serverPort = '27023';
+                // On cherche le serveur via l'IP pour être sûr (plus fiable que l'ID qui peut changer si tu réinstalles)
+                const response = await fetch(`https://api.battlemetrics.com/servers?filter[game]=gmod&filter[search]=${SERVER_IP}:${SERVER_PORT}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
                 
-                // Option 1: Via API GameTracker
-                const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}:${serverPort}`);
                 const data = await response.json();
                 
-                if (data.online) {
-                    document.getElementById('players').textContent = `${data.players.online}/${data.players.max}`;
+                if (data && data.data && data.data.length > 0) {
+                    const server = data.data[0].attributes;
+                    
+                    // Mise à jour du nombre de joueurs
+                    const players = server.players;
+                    const maxPlayers = server.maxPlayers;
+                    document.getElementById('players').textContent = `${players}/${maxPlayers}`;
+
+                    // Mise à jour de la map si GMOD ne l'a pas encore fait
+                    if(!currentMap) {
+                        document.getElementById('mapName').textContent = server.details.map;
+                    }
                 }
             } catch (error) {
-                console.log('Impossible de récupérer les stats du serveur');
+                console.error("Erreur API BattleMetrics:", error);
+                // Fallback si l'API échoue : on laisse 0/? ou ce que GMOD a donné
             }
         }
 
-        // Appeler la fonction au chargement
-        fetchServerStats();
+        // Rafraichir les données toutes les 30 sec (utile si le chargement est très long)
+        setInterval(() => fetchServerData(), 30000);
         
-        // Mettre à jour toutes les 30 secondes
-        setInterval(fetchServerStats, 30000);
+        // Appel initial au cas où GameDetails ne se lance pas (test navigateur)
+        fetchServerData();
+
     </script>
 </body>
 </html>

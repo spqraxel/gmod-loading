@@ -453,17 +453,25 @@ async function fetchServerData() {
 
         const server = data.data[0].attributes;
 
-        /* MAJ joueurs */
-        document.getElementById('players').textContent =
-            `${server.players}/${server.maxPlayers}`;
-        document.getElementById('mapName').textContent = server.details.map;
-        // Si tu veux tu peux aussi MAJ gamemode
-        document.querySelector('.server-info .info-item span:nth-child(1)').textContent = server.players+'/'+server.maxPlayers;
+        /* MAJ HUD */
+        // Nombre de joueurs réel
+        const currentPlayers = server.players ?? 0;
+        const maxPlayers = server.maxPlayers ?? 0;
+
+        document.getElementById('players').textContent = `${currentPlayers}/${maxPlayers}`;
+
+        // Map
+        document.getElementById('mapName').textContent = server.details?.map || "Inconnue";
+
+        // Gamemode
+        document.querySelector('.server-info .info-item span:nth-child(1)').textContent =
+            `${currentPlayers}/${maxPlayers}`;
 
     } catch (e) {
         console.warn("BattleMetrics API error", e);
     }
 }
+
 
 /* L’API est lente → on attend 5s */
 setTimeout(fetchServerData, 5000);

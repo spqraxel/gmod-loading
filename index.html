@@ -887,37 +887,37 @@ const SERVER_ID = "36972842";
 async function fetchServerData() {
     try {
         const response = await fetch(
-            `https://api.battlemetrics.com/servers?filter[id]=${SERVER_ID}`,
+            `https://api.battlemetrics.com/servers/${SERVER_ID}`,
             { headers: { "Accept": "application/json" } }
         );
-
         const data = await response.json();
-        if (!data.data || !data.data[0]) return;
+        if (!data.data) return;
 
-        const server = data.data[0].attributes;
+        const server = data.data.attributes;
 
-        /* MAJ HUD */
-        // Nombre de joueurs réel
+        // MAJ HUD
         const currentPlayers = server.players ?? 0;
         const maxPlayers = server.maxPlayers ?? 0;
-
         document.getElementById('players').textContent = `${currentPlayers}/${maxPlayers}`;
 
         // Map
         document.getElementById('mapName').textContent = server.details?.map || "Inconnue";
 
         // Gamemode
-        document.querySelector('.server-info .info-item span:nth-child(1)').textContent =
-            `${currentPlayers}/${maxPlayers}`;
+        const gamemode = server.details?.gameMode || "Inconnu";
+        document.querySelectorAll('.server-info .info-item span')[2].textContent = gamemode;
 
     } catch (e) {
         console.warn("BattleMetrics API error", e);
     }
 }
 
+// Refresh toutes les 5 secondes
+setInterval(fetchServerData, 5000);
 
-/* L’API est lente → on attend 5s */
-setTimeout(fetchServerData, 5000);
+// Fetch initial
+fetchServerData();
+
 </script>
 </body>
 </html>

@@ -363,9 +363,10 @@
     </div>
 
     <!-- Audio (musique de fond) -->
-    <audio id="bgMusic" autoplay loop preload="auto">
+    <audio id="bgMusic" loop preload="auto">
         <source src="music.mp3" type="audio/mpeg">
     </audio>
+
 
 <script>
         // --- 1. GESTION VISUELLE (Particules & Musique) ---
@@ -386,11 +387,19 @@
         createParticles('slayersParticles', 50);
 
         const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.05; // Volume doux
+        bgMusic.volume = 0.03; // 3% = parfait pour un loading screen
+        
+        let musicStarted = false;
+        function startMusic() {
+            if (musicStarted) return;
+            musicStarted = true;
+            bgMusic.play().catch(() => {});
+        }
+        
+        document.addEventListener('click', startMusic);
+        document.addEventListener('keydown', startMusic);
+        window.addEventListener('load', startMusic);
 
-        // Astuce pour forcer la lecture de l'audio (les navigateurs bloquent souvent l'autoplay)
-        document.addEventListener('click', () => { bgMusic.play(); }, { once: true });
-        window.onload = () => { bgMusic.play().catch(e => console.log("Clic requis pour la musique")); };
 
 
         // --- 2. GESTION DU CHARGEMENT (Vraies données GMOD) ---
@@ -427,12 +436,14 @@
         // Appelée à chaque fichier téléchargé (compte à rebours)
         function SetFilesNeeded(needed) {
             neededFiles = needed;
-            
-            // Calcul du pourcentage réel
-            if (totalFiles > 0) {
-                const percentage = Math.round(((totalFiles - neededFiles) / totalFiles) * 100);
-                progressFill.style.width = percentage + '%';
-            }
+        
+            if (totalFiles <= 0) return;
+        
+            const done = totalFiles - neededFiles;
+            const percentage = Math.min(100, Math.max(0, Math.round((done / totalFiles) * 100)));
+            progressFill.style.width = percentage + '%';
+        }
+
         }
 
         // --- 3. API POUR LES JOUEURS (Via BattleMetrics) ---
@@ -440,7 +451,7 @@
         // IMPORTANT : Tu dois trouver l'ID BattleMetrics de ton serveur.
         // Va sur https://www.battlemetrics.com/servers/gmod, cherche ton serveur, 
         // l'ID est dans l'URL (ex: .../servers/gmod/12345678)
-        const SERVER_IP = "51.178.49.51; 
+        const SERVER_IP = "51.178.49.51"; 
         const SERVER_PORT = "27015";
 
         async function fetchServerData(currentMap) {
